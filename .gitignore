@@ -27,6 +27,7 @@ venv/
 *.env
 secrets.yml
 .vagrantuser
+.gitignore
 
 ### Arquivos temporários ###
 *.tmp
