@@ -1,0 +1,203 @@
+{
+  "title": "Grafana Metrics",
+  "description": "Dashboard para monitoramento das métricas internas do Grafana",
+  "tags": ["grafana", "monitoring"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Grafana Uptime",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "time() - grafana_process_start_time_seconds",
+          "format": "time_secs",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 3600}
+            ]
+          },
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "title": "HTTP Requests Rate",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 6, "y": 0, "w": 18, "h": 8},
+      "targets": [
+        {
+          "expr": "sum(rate(grafana_http_request_duration_seconds_count[1m])) by (method)",
+          "legendFormat": "{{method}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      }
+    },
+    {
+      "title": "HTTP Response Status Codes",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "sum(rate(grafana_http_request_duration_seconds_count[1m])) by (status)",
+          "legendFormat": "HTTP {{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "HTTP Request Duration (99th percentile)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(grafana_http_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p99",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(grafana_http_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(grafana_http_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p50",
+          "refId": "C"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "title": "Grafana Memory Usage",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes{job=\"grafana\"}",
+          "legendFormat": "Memory",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "title": "Active Dashboards",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 12, "y": 16, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "grafana_stat_totals_dashboard{stat=\"active\"}",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "title": "Active Users",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 18, "y": 16, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "grafana_stat_totals_user{stat=\"active\"}",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "title": "Grafana Version Info",
+      "type": "table",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 20, "w": 24, "h": 6},
+      "targets": [
+        {
+          "expr": "grafana_build_info",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "columns": [
+        {"text": "Version", "value": "version"},
+        {"text": "Revision", "value": "revision"},
+        {"text": "Branch", "value": "branch"},
+        {"text": "Build Host", "value": "goversion"}
+      ],
+      "options": {
+        "showHeader": true,
+        "footer": {"show": false}
+      }
+    }
+  ],
+  "version": 1
+}

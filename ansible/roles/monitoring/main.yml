@@ -1,0 +1,52 @@
+---
+- name: Criar estrutura de diretórios
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: vagrant
+    group: vagrant
+  loop:
+    - /opt/monitoring
+    - /opt/monitoring/prometheus
+    - /opt/monitoring/grafana/provisioning/dashboards
+    - /opt/monitoring/grafana/provisioning/datasources
+
+- name: Copiar arquivos do Prometheus
+  copy:
+    src: "{{ playbook_dir }}/../monitoring/prometheus/{{ item }}"
+    dest: "/opt/monitoring/prometheus/{{ item }}"
+    owner: vagrant
+    group: vagrant
+  loop:
+    - prometheus.yml
+
+- name: Copiar arquivos do Grafana
+  copy:
+    src: "{{ playbook_dir }}/../monitoring/grafana/provisioning/{{ item }}"
+    dest: "/opt/monitoring/grafana/provisioning/{{ item }}"
+    owner: vagrant
+    group: vagrant
+  loop:
+    - dashboards/dashboard.yml
+    - dashboards/docker_dashboard.json
+    - dashboards/grafana_metrics.json
+    - dashboards/node_exporter_dashboard.json
+    - dashboards/prometheus.json
+    - datasources/prometheus.yml
+
+- name: Copiar docker-compose.yml
+  copy:
+    src: "{{ playbook_dir }}/../monitoring/docker-compose.yml"
+    dest: "/opt/monitoring/docker-compose.yml"
+    owner: vagrant
+    group: vagrant
+
+- name: Start monitoring stack
+  shell: docker-compose up -d
+  args:
+    chdir: /opt/monitoring
+  environment:
+    COMPOSE_PROJECT_NAME: monitoring
+  
+   

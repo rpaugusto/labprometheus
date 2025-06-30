@@ -1,0 +1,146 @@
+{
+  "title": "Docker Monitoring",
+  "description": "Dashboard para monitoramento de containers e serviços Docker",
+  "tags": ["docker", "containers"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Running Containers",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "count(container_memory_usage_bytes{container_label_org_opencontainers_image_title=~\".+\"})",
+          "legendFormat": "Containers",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "title": "CPU Usage by Container",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 6, "y": 0, "w": 18, "h": 8},
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_org_opencontainers_image_title=~\".+\"}[1m])) by (container_label_org_opencontainers_image_title) * 100",
+          "legendFormat": "{{container_label_org_opencontainers_image_title}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100
+        }
+      }
+    },
+    {
+      "title": "Memory Usage by Container",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "container_memory_usage_bytes{container_label_org_opencontainers_image_title=~\".+\"}",
+          "legendFormat": "{{container_label_org_opencontainers_image_title}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "title": "Network I/O by Container",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(container_network_receive_bytes_total{container_label_org_opencontainers_image_title=~\".+\"}[1m])",
+          "legendFormat": "{{container_label_org_opencontainers_image_title}} RX",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(container_network_transmit_bytes_total{container_label_org_opencontainers_image_title=~\".+\"}[1m])",
+          "legendFormat": "{{container_label_org_opencontainers_image_title}} TX",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        }
+      }
+    },
+    {
+      "title": "Disk I/O by Container",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(container_fs_reads_bytes_total{container_label_org_opencontainers_image_title=~\".+\"}[1m])",
+          "legendFormat": "{{container_label_org_opencontainers_image_title}} Read",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(container_fs_writes_bytes_total{container_label_org_opencontainers_image_title=~\".+\"}[1m])",
+          "legendFormat": "{{container_label_org_opencontainers_image_title}} Write",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        }
+      }
+    },
+    {
+      "title": "Container Status",
+      "type": "table",
+      "datasource": "Prometheus",
+      "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "container_last_seen{container_label_org_opencontainers_image_title=~\".+\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "columns": [
+        {"text": "Container", "value": "container_label_org_opencontainers_image_title"},
+        {"text": "State", "value": "container_state"},
+        {"text": "Status", "value": "container_status"}
+      ],
+      "options": {
+        "showHeader": true,
+        "footer": {"show": false}
+      }
+    }
+  ],
+  "version": 1
+}

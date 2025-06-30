@@ -1,0 +1,53 @@
+# Arquivo .gitignore para labprometheus
+
+### Diretórios/VirtualEnv ###
+.vagrant/
+.idea/
+.vscode/
+__pycache__/
+venv/
+
+### Arquivos do Vagrant ###
+*.log
+*.box
+
+### Arquivos do VirtualBox ###
+*.vdi
+*.vbox
+*.vbox-prev
+
+### Arquivos do Docker ###
+**/data/
+**/grafana/data/
+**/prometheus/data/
+**/docker-volumes/
+
+### Arquivos de configuração local ###
+*.local
+*.env
+secrets.yml
+.vagrantuser
+
+### Arquivos temporários ###
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+### Arquivos de log ###
+*.log
+logs/
+
+### Binários ###
+*.exe
+*.bin
+
+### Backups ###
+*.bak
+*.old
+
+### Arquivos do Ansible ###
+*.retry
+*.pyc
+
